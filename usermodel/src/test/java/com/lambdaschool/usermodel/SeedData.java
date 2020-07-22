@@ -116,7 +116,7 @@ public class SeedData implements CommandLineRunner
         u5.getRoles().add(new UserRoles(u5, r2));
         userService.save(u5);
 
-        if (false)
+        if (false) // commented out so these won't show up in tests.
         {
             // using JavaFaker create a bunch of regular users
             // https://www.baeldung.com/java-faker
