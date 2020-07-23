@@ -2,20 +2,14 @@ package com.lambdaschool.usermodel.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.Email;
 
 /**
  * The entity allowing interaction with the useremails table
  * <p>
- * requires each combination of user and useremail to be unique. The same email cannot be assigned to the same user more than once.
+ * requires each combination of user and useremail to be unique. The same email cannot be assigned to the same user
+ * more than once.
  */
 @Entity
 @Table(name = "useremails")
@@ -46,7 +40,8 @@ public class Useremail extends Auditable
     @ManyToOne
     @JoinColumn(name = "userid",
         nullable = false)
-    @JsonIgnoreProperties(value = "useremails", allowSetters = true)
+    @JsonIgnoreProperties(value = "useremails",
+        allowSetters = true)
     private User user;
 
     /**

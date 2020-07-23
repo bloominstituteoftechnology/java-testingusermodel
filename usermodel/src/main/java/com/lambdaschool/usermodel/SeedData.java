@@ -14,10 +14,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Locale;
-import java.util.Set;
 
 /**
  * SeedData puts both known and random data into the database. It implements CommandLineRunner.

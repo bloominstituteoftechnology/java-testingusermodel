@@ -1,6 +1,7 @@
 package com.lambdaschool.usermodel.services;
 
 import com.lambdaschool.usermodel.UserModelApplication;
+import com.lambdaschool.usermodel.models.User;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
@@ -15,6 +16,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import javax.persistence.EntityNotFoundException;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = UserModelApplication.class)
@@ -74,7 +76,7 @@ public class UserServiceImplTest
     @Test
     public void d_delete()
     {
-        userService.delete(7);
+        userService.delete(4);
         assertEquals(4,
             userService.findAll()
                 .size());
@@ -92,8 +94,8 @@ public class UserServiceImplTest
     @Test
     public void e_findByName()
     {
-        assertEquals("admin",
-            userService.findByName("admin")
+        assertEquals("misskitty",
+            userService.findByName("misskitty")
                 .getUsername());
     }
 
@@ -108,11 +110,41 @@ public class UserServiceImplTest
     @Test
     public void f_save()
     {
+        User newUser = new User("test one",
+            "pass one",
+            "myemail@email");
+
+        User addUser = userService.save(newUser);
+        assertNotNull(addUser);
+        User foundUser = userService.findUserById(addUser.getUserid());
+        assertEquals(addUser.getUsername(),
+            foundUser.getUsername());
     }
 
     @Test
     public void g_update()
     {
+        User newUser = new User("test two",
+            "pass two",
+            "myemail@email");
+
+        User updateUser = userService.update(newUser,
+            11);
+        assertEquals("pass two",
+            updateUser.getPassword());
+    }
+
+    @Test(expected = EntityNotFoundException.class)
+    public void ga_updateFail()
+    {
+        User newUser = new User("test two",
+            "pass two",
+            "myemail@email");
+
+        User updateUser = userService.update(newUser,
+            777);
+        assertEquals("pass two",
+            updateUser.getPassword());
     }
 
     @Test
