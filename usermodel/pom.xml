@@ -76,15 +76,22 @@
             <version>2.9.2</version>
         </dependency>
         <!-- Swagger Dependencies End -->
-    </dependencies>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
+        <!-- needed for testing -->
+       <dependency>
+           <groupId>io.rest-assured</groupId>
+           <artifactId>spring-mock-mvc</artifactId>
+           <version>3.3.0</version>
+       </dependency>
+   </dependencies>
+
+   <build>
+       <plugins>
+           <plugin>
+               <groupId>org.springframework.boot</groupId>
+               <artifactId>spring-boot-maven-plugin</artifactId>
+           </plugin>
+       </plugins>
+   </build>
 
 </project>
