@@ -62,7 +62,7 @@ public class SeedData implements CommandLineRunner
         r3 = roleService.save(r3);
 
         // admin, data, user
-        User u1 = new User("admin",
+        User u1 = new User("Test admin",
                            "password",
                            "admin@lambdaschool.local");
         u1.getRoles().add(new UserRoles(u1, r1));
@@ -78,7 +78,7 @@ public class SeedData implements CommandLineRunner
         userService.save(u1);
 
         // data, user
-        User u2 = new User("cinnamon",
+        User u2 = new User("Test cinnamon",
                            "1234567",
                            "cinnamon@lambdaschool.local");
         u2.getRoles().add(new UserRoles(u2, r2));
@@ -95,7 +95,7 @@ public class SeedData implements CommandLineRunner
         userService.save(u2);
 
         // user
-        User u3 = new User("barnbarn",
+        User u3 = new User("Test barnbarn",
                            "ILuvM4th!",
                            "barnbarn@lambdaschool.local");
         u3.getRoles().add(new UserRoles(u3, r2));
@@ -104,13 +104,13 @@ public class SeedData implements CommandLineRunner
                                    "barnbarn@email.local"));
         userService.save(u3);
 
-        User u4 = new User("puttat",
+        User u4 = new User("Test puttat",
                            "password",
                            "puttat@school.lambda");
         u4.getRoles().add(new UserRoles(u4, r2));
         userService.save(u4);
 
-        User u5 = new User("misskitty",
+        User u5 = new User("Test misskitty",
                            "password",
                            "misskitty@school.lambda");
         u5.getRoles().add(new UserRoles(u5, r2));
