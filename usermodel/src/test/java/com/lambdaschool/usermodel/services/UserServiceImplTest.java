@@ -7,21 +7,24 @@ import com.lambdaschool.usermodel.models.UserRoles;
 import com.lambdaschool.usermodel.models.Useremail;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.MethodSorters;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.persistence.EntityNotFoundException;
-import java.util.List;
 
+import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.*;
 
 // Service Impl using DB
 @RunWith(SpringRunner.class) // tell junit we're doing a spring app
 @SpringBootTest(classes = UserModelApplication.class)// where is our public static void main
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class UserServiceImplTest
 {
     @Autowired
@@ -45,48 +48,59 @@ public class UserServiceImplTest
     }
 
     @Test
-    public void findUserById()
+    public void A_findUserById()
     {
         assertEquals("test cinnamon", userService.findUserById(7).getUsername());
     }
 
     @Test(expected = EntityNotFoundException.class)
-    public void findUserByIdNotFound()
+    public void AB_findUserByIdNotFound()
     {
         assertEquals("test cinnamon", userService.findUserById(100).getUsername());
     }
 
     @Test
-    public void findByNameContaining()
+    public void B_findByNameContaining()
     {
         assertEquals(1, userService.findByNameContaining("cin").size());
     }
 
     @Test
-    public void findAll()
+    public void C_findAll()
     {
         assertEquals(5, userService.findAll().size());
     }
 
     @Test
-    public void delete()
+    public void E_delete()
     {
-    }
-
-    @Test
-    public void findByName()
-    {
-        assertEquals("test cinnamon", userService.findByName("test cinnamon").getUsername());
+        userService.delete(7);
+        assertEquals(4, userService.findAll().size());
     }
 
     @Test(expected = EntityNotFoundException.class)
-    public void findByNameNotFound()
+    public void EA_deleteNotFound()
     {
-        assertEquals("test frank", userService.findByName("test frank").getUsername());
+        userService.delete(100);
+        assertEquals(4, userService.findAll().size());
     }
 
     @Test
-    public void saveadd()
+    public void D_findByName()
+    {
+        assertEquals("test cinnamon", userService.findByName("test cinnamon").getUsername());
+        assertEquals("test barnbarn", userService.findByName("test barnbarn").getUsername());
+    }
+
+    @Test(expected = EntityNotFoundException.class)
+    public void DA_findByNameNotFound()
+    {
+        assertEquals("test cinnamon", userService.findByName("test frank").getUsername());
+        assertEquals("test barnbarn", userService.findByName("test elle").getUsername());
+    }
+
+    @Test
+    public void F_saveadd()
     {
         // create user obj
         String user2username = "test lauren";
@@ -111,7 +125,7 @@ public class UserServiceImplTest
     }
 
     @Test
-    public void saveput()
+    public void FA_saveput()
     {
         // create user obj
         String user2username = "Test Lauren";
@@ -132,12 +146,14 @@ public class UserServiceImplTest
     }
 
     @Test
-    public void update()
+    public void G_update()
     {
     }
 
     @Test
-    public void deleteAll()
+    public void H_deleteAll()
     {
+        userService.deleteAll();
+        assertEquals(0, userService.findAll().size());
     }
 }
