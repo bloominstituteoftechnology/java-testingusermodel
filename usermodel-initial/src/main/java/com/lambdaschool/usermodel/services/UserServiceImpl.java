@@ -13,23 +13,14 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Implements UserService Interface
- */
 @Transactional
 @Service(value = "userService")
 public class UserServiceImpl
     implements UserService
 {
-    /**
-     * Connects this service to the User table.
-     */
     @Autowired
     private UserRepository userrepos;
 
-    /**
-     * Connects this service to the Role table
-     */
     @Autowired
     private RoleService roleService;
 
