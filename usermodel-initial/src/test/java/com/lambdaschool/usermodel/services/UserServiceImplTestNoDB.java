@@ -12,6 +12,7 @@ import com.lambdaschool.usermodel.models.Useremail;
 import com.lambdaschool.usermodel.repository.RoleRepository;
 import com.lambdaschool.usermodel.repository.UserRepository;
 import com.lambdaschool.usermodel.repository.UseremailRepository;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
@@ -24,6 +25,7 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.ArrayList;
@@ -33,6 +35,7 @@ import java.util.Optional;
 
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = UserModelApplicationTesting.class,
@@ -62,8 +65,6 @@ public class UserServiceImplTestNoDB
     {
         userList = new ArrayList<>();
 
-        userService.deleteAll();
-        roleService.deleteAll();
         Role r1 = new Role("admin");
         Role r2 = new Role("user");
         Role r3 = new Role("data");
@@ -167,12 +168,12 @@ public class UserServiceImplTestNoDB
         Mockito.when(userRepository.findByUsernameContainingIgnoreCase("asdfwsadf"))
             .thenThrow(ResourceNotFoundException.class);
 
-        assertEquals("asdfwsadf",
-            userService.findByNameContaining("admin Test"));
+        assertEquals(0,
+            userService.findByNameContaining("asdfwsadf").size());
     }
 
     @Test
-    public void findAll()
+    public void c_findAll()
     {
         Mockito.when(userRepository.findAll())
             .thenReturn(userList);
@@ -182,7 +183,7 @@ public class UserServiceImplTestNoDB
     }
 
     @Test
-    public void delete()
+    public void d_delete()
     {
         Mockito.when(userRepository.findById(4L))
             .thenReturn(Optional.of(userList.get(0)));
@@ -196,8 +197,23 @@ public class UserServiceImplTestNoDB
             userList.size());
     }
 
+    @Test(expected = ResourceNotFoundException.class)
+    public void dd_deleteFailed()
+    {
+        Mockito.when(userRepository.findById(234L))
+            .thenReturn(Optional.empty());
+
+        Mockito.doNothing()
+            .when(userRepository)
+            .deleteById(234L);
+
+        userService.delete(234);
+        assertEquals(2,
+            userList.size());
+    }
+
     @Test
-    public void findByName()
+    public void e_findByName()
     {
         Mockito.when(userRepository.findByUsername("admin Test".toLowerCase()))
             .thenReturn(userList.get(0));
@@ -208,51 +224,87 @@ public class UserServiceImplTestNoDB
     }
 
     @Test
-    public void save()
+    public void f_save()
     {
-        String user3Name = "Indy Test";
-        User u3 = new User(user3Name,
+        Role roleType1 = new Role("dog");
+        roleType1.setRoleid(10);
+
+        User u3 = new User("Indy Test",
             "password",
-            "dog@gmail.com"
-            );
-        Role roleType4 = new Role("dog");
-        roleType4.setRoleid(4);
-
-//        u1.getUseremails()
-//            .add(new Useremail(u1,
-//                "admin@mymail.local"));
-//        u1.getUseremails().get(1).setUseremailid(12);
-
-//        u1.getRoles()
-//            .add(new UserRoles(u1,
-//                r2));
+            "dog@lambdaschool.local");
 
         u3.getRoles()
-            .add(new UserRoles(u3, roleType4));
+            .add(new UserRoles(u3,
+                roleType1));
 
         u3.getUseremails()
-            .add(new Useremail(u3, "dog@gmail.com"));
-        u3.getUseremails().get(1).setUseremailid(41);
+            .add(new Useremail(u3,
+                "dog@email.local"));
+        u3.getUseremails().get(0).setUseremailid(31);
+
+        u3.getUseremails()
+            .add(new Useremail(u3,
+                "admin@mymail.local"));
+        u3.getUseremails().get(1).setUseremailid(32);
 
         Mockito.when(userRepository.save(any(User.class)))
             .thenReturn(u3);
-        Mockito.when(roleService.findRoleById(4))
-            .thenReturn(roleType4);
+        Mockito.when(roleService.findRoleById(10L))
+            .thenReturn(roleType1);
 
         User addUser = userService.save(u3);
         assertNotNull(addUser);
-        assertEquals(user3Name.toLowerCase(),
-            addUser.getUsername());
+        assertEquals(addUser.getUsername().toLowerCase(),
+            addUser.getUsername().toLowerCase());
+    }
+
+    @Test
+    public void g_update() throws Exception
+    {
+        Role roleType1 = new Role("dog");
+        roleType1.setRoleid(10);
+
+        User u3 = new User("Indy Test123",
+            "password",
+            "dog@lambdaschool.local");
+                u3.setUserid(30);
+        u3.getRoles()
+            .add(new UserRoles(u3,
+                roleType1));
+
+        u3.getUseremails()
+            .add(new Useremail(u3,
+                "dog@email.local"));
+        u3.getUseremails().get(0).setUseremailid(31);
+
+        u3.getUseremails()
+            .add(new Useremail(u3,
+                "admin@mail.local"));
+        u3.getUseremails().get(1).setUseremailid(32);
+
+        Mockito.when(helperFunctions.isAuthorizedToMakeChange(anyString())).thenReturn(true);
+        Mockito.when(userRepository.findById(30L))
+            .thenReturn(Optional.of(userList.get(0)));
+        Mockito.when(roleRepository.findById(10L))
+            .thenReturn(Optional.of(roleType1));
+
+        Mockito.when(userRepository.save(any(User.class)))
+            .thenReturn(u3);
+
+        User addUser = userService.update(u3, 30);
+
+        assertNotNull(addUser);
+        assertEquals(u3.getUsername(), addUser.getUsername());
 
     }
 
     @Test
-    public void update()
+    public void h_deleteAll()
     {
-    }
-
-    @Test
-    public void deleteAll()
-    {
+//        Mockito.when(userRepository.findAll())
+//            .thenReturn(Optional.of(userList.get()));
+//
+//        userList.deleteAll();
+//        assertEquals(0, userList.size());
     }
 }
