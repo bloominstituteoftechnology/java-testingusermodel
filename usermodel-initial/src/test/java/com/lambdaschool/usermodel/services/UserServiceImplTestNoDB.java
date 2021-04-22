@@ -5,6 +5,7 @@ import com.lambdaschool.usermodel.models.Role;
 import com.lambdaschool.usermodel.models.User;
 import com.lambdaschool.usermodel.models.UserRoles;
 import com.lambdaschool.usermodel.models.Useremail;
+import com.lambdaschool.usermodel.repository.RoleRepository;
 import com.lambdaschool.usermodel.repository.UserRepository;
 import org.junit.After;
 import org.junit.Before;
@@ -20,12 +21,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.any;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = UserModelApplicationTesting.class,
         properties = {
@@ -39,6 +43,9 @@ public class UserServiceImplTestNoDB {
 
     @MockBean
     private UserRepository userRepository;
+
+    @MockBean
+    private RoleRepository rolerepos;
 
     @Autowired
     private HelperFunctions helperFunctions;
@@ -160,18 +167,50 @@ public class UserServiceImplTestNoDB {
     }
     @Test
     public void findAll() {
+        Mockito.when(userRepository.findAll())
+                .thenReturn(userList);
+        assertEquals(5,userService.findAll().size());
+
     }
 
     @Test
     public void delete() {
+        Mockito.when(userRepository.findById(30L))
+                .thenReturn(Optional.of(userList.get(0)));
+        Mockito.doNothing()
+                .when(userRepository)
+                .deleteById(30L);
     }
 
-    @Test
-    public void findByName() {
-    }
-
-    @Test
+//    @Test
+//    public void findByName () {
+//        Mockito.when(userRepository.findByUsernameContainingIgnoreCase("barnbarn"))
+//                .thenReturn( userList.get(0));
+//        assertEquals("barnbarn",userService.findByName("barnbarn").getUsername());
+//    }
+   @Test
     public void save() {
+        String userName3 = "Marley";
+        User user3 = new User(userName3,
+                "cingaderosa",
+                "marley@gmail.com");
+        user3.setUserid(50L);
+       Role roleType1 = new Role("Turtle");
+       roleType1.setRoleid(1);
+
+       user3.getRoles()
+               .add(new UserRoles(user3,roleType1));
+
+        Mockito.when(userRepository.save(any(User.class)))
+                .thenReturn(user3);
+        Mockito.when(rolerepos.findById(1L))
+                .thenReturn(Optional.of(roleType1));
+
+        User addUser = userService.save(user3);
+        assertNotNull(addUser);
+        assertEquals(userName3,
+                addUser.getUsername());
+
     }
 
     @Test
