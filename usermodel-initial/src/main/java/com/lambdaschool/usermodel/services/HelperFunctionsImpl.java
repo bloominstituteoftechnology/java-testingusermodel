@@ -27,7 +27,8 @@ public class HelperFunctionsImpl
         // data validations get wrapped in other exceptions as we work through the Spring
         // exception chain. Hence we have to search the entire Spring Exception Stack
         // to see if we have any violation constraints.
-        while ((cause != null) && !(cause instanceof org.hibernate.exception.ConstraintViolationException || cause instanceof MethodArgumentNotValidException))
+        while ((cause != null) && !(cause instanceof ConstraintViolationException ||
+            cause instanceof MethodArgumentNotValidException))
         {
             System.out.println(cause.getClass()
                 .toString());
@@ -39,9 +40,9 @@ public class HelperFunctionsImpl
         // we know that cause either null or an instance of ConstraintViolationException
         if (cause != null)
         {
-            if (cause instanceof org.hibernate.exception.ConstraintViolationException)
+            if (cause instanceof ConstraintViolationException)
             {
-                org.hibernate.exception.ConstraintViolationException ex = (ConstraintViolationException) cause;
+                ConstraintViolationException ex = (ConstraintViolationException) cause;
                 ValidationError newVe = new ValidationError();
                 newVe.setCode(ex.getMessage());
                 newVe.setMessage(ex.getConstraintName());
