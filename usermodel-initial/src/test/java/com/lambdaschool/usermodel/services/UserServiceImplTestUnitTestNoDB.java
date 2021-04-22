@@ -21,6 +21,7 @@ import java.util.*;
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = UserModelApplicationTesting.class,
@@ -37,10 +38,17 @@ public class UserServiceImplTestUnitTestNoDB {
   // Java -> mocks
 
   @MockBean
+  private HelperFunctions helperFunctions;
+
+  @MockBean
+  private RoleService roleService;
+
+  @MockBean
   private UserRepository userrepos;
 
   @MockBean
   private RoleRepository rolerepos;
+
 
   private List<User> userList;
 
@@ -242,33 +250,6 @@ public class UserServiceImplTestUnitTestNoDB {
     assertNotNull(addUser);
     assertEquals("testtarah",addUser.getUsername());
   }
-
-  @Test(expected = ResourceNotFoundException.class)
-  public void test_saveRoleNotFound() {
-    User newUser = new User(
-        "testtarah",
-        "password",
-        "tarah.agbokhana@gmail.com");
-
-    Role newRole = new Role("DATA-MGR");
-    newRole.setRoleid(1);
-
-    newUser.getRoles()
-           .add(new UserRoles(newUser, newRole));
-    newUser.getUseremails()
-           .add(new Useremail(newUser, "tagbokhana@gmail.com"));
-
-    Mockito.when(userrepos.save(any(User.class)))
-           .thenReturn(newUser);
-
-    Mockito.when(rolerepos.findById(1L))
-           .thenReturn(Optional.empty());//return no role
-
-    User addUser = userService.save(newUser);
-    assertNotNull(addUser);
-    assertEquals("testtarah",addUser.getUsername());
-  }
-
   @Test
   public void test_save_put(){
     User newUser = new User(
@@ -281,16 +262,11 @@ public class UserServiceImplTestUnitTestNoDB {
     Role newRole1 = new Role("Unknown1");
     newRole1.setRoleid(1);
 
-    Role newRole2 = new Role("Unknown2");
-    newRole2.setRoleid(2);
-
     newUser.getRoles()
            .clear();
 
     newUser.getRoles()
            .add(new UserRoles(newUser, newRole1));
-    newUser.getRoles()
-           .add(new UserRoles(newUser, newRole2));
 
     newUser.getUseremails()
            .add(new Useremail(newUser, "tagbokhana@gmail.com"));
@@ -300,9 +276,6 @@ public class UserServiceImplTestUnitTestNoDB {
 
     Mockito.when(rolerepos.findById(1L))
            .thenReturn(Optional.of(newRole1));
-
-    Mockito.when(rolerepos.findById(2L))
-           .thenReturn(Optional.of(newRole2));
 
     Mockito.when(userrepos.save(any(User.class)))
            .thenReturn(newUser);
@@ -353,60 +326,49 @@ public class UserServiceImplTestUnitTestNoDB {
                  userService.save(newUser).getUserid());
   }
 
-//  @Test
-//  public void test_update() throws Exception {
-//    User newUser = new User(
-//        "testtarah",
-//        "password",
-//        "tarah.agbokhana@gmail.com");
-//
-//    newUser.setUserid(22);
-//
-//    Role newRole1 = new Role("Unknown1");
-//    newRole1.setRoleid(1);
-//
-//    Role newRole2 = new Role("Unknown2");
-//    newRole2.setRoleid(2);
-//
-//    newUser.getRoles()
-//           .add(new UserRoles(newUser, newRole1));
-//    newUser.getRoles()
-//           .add(new UserRoles(newUser, newRole2));
-//
-//    newUser.getUseremails()
-//           .add(new Useremail(newUser, "tagbokhana@gmail.com"));
-//    System.out.println(newUser.getUsername());
-//
-//
-//    // I need a copy of "newUser" to send to update so the original "newUser"
-//    // is not changed. I am using Jackson to make a clone of the object
-//    ObjectMapper objectMapper = new ObjectMapper();
-//
-//    User clonedUser = objectMapper
-//        .readValue(objectMapper.writeValueAsString(newUser), User.class);
-//
-//    Mockito.when(userrepos.findById(22L))
-//           .thenReturn(Optional.of(clonedUser));
-//
-//    System.out.println(clonedUser.getUsername());
-//
-//    Mockito.when(rolerepos.findById(1L))
-//           .thenReturn(Optional.of(newRole1));
-//
-//    Mockito.when(rolerepos.findById(2L))
-//           .thenReturn(Optional.of(newRole2));
-//
-//    Mockito.when(userrepos.save(any(User.class)))
-//           .thenReturn(newUser);
-//
-//    User addUser = userService.update(newUser, 22L);
-//    System.out.println("adduser: " + addUser.getUsername());
-//
-//    String name = "testtarah";
-//    assertNotNull(addUser);
-//    assertEquals(name,
-//                 addUser.getUsername());
-//  }
+  @Test
+  public void test_update() {
+    User newUser = new User(
+        "testtarah",
+        "password",
+        "tarah.agbokhana@gmail.com");
+
+    Role newRole1 = new Role("Unknown1");
+    newRole1.setRoleid(1);
+
+    newUser.getRoles()
+           .add(new UserRoles(newUser, newRole1));
+
+    newUser.getUseremails()
+           .add(new Useremail(newUser, "tagbokhana@gmail.com"));
+    newUser.getUseremails()
+           .add(new Useremail(newUser, "tarah@gmail.com"));
+    System.out.println(newRole1.getRoleid());
+
+    Mockito.when(roleService.findRoleById(1))
+           .thenReturn(newRole1);
+    System.out.println(roleService.findRoleById(1));
+
+    Mockito.when(userrepos.findById(7L))
+           .thenReturn(Optional.of(userList.get(1)));
+    System.out.println(userrepos.findById(7L));
+
+    Mockito.when(userrepos.save(any(User.class)))
+           .thenReturn(newUser);
+
+    Mockito.when(helperFunctions.isAuthorizedToMakeChange(anyString()))
+           .thenReturn(true);
+
+///   User addUser = userService.update(newUser, 22L);
+   // System.out.println("adduser: " + addUser.getUsername());
+
+
+    assertEquals("tarah@gmail.com",
+                 userService.update(newUser, 7L)
+                .getUseremails()
+                .get(1)
+                .getUseremail());
+  }
 
   @Test(expected = ResourceNotFoundException.class)
   public void test_update_failed() throws Exception {
@@ -447,7 +409,7 @@ public class UserServiceImplTestUnitTestNoDB {
            .thenReturn(newUser);
 
     User addUser = userService.update(newUser, 18);
-
+    System.out.println("#3 "+ addUser.getUsername());
     assertNotNull(addUser);
     assertEquals("testtarah",
                  addUser.getUsername());
