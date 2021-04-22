@@ -1,5 +1,7 @@
 package com.lambdaschool.usermodel.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lambdaschool.usermodel.UserModelApplicationTesting;
 import com.lambdaschool.usermodel.models.Role;
 import com.lambdaschool.usermodel.models.User;
@@ -24,8 +26,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = UserModelApplicationTesting.class,
@@ -44,7 +48,7 @@ public class UserServiceImplTestNoDB {
   private RoleRepository rolerepos;
 
 
-  @Autowired
+  @MockBean
   private HelperFunctions helperFunctions;
 
   private List<User> userList;
@@ -53,32 +57,30 @@ public class UserServiceImplTestNoDB {
   public void setUp() throws Exception {
      userList = new ArrayList<>();
 
-    Role role1 = new Role("admin");
-    Role role2 = new Role("user");
-    Role role3 = new Role("data");
+    Role r1 = new Role("admin");
+    Role r2 = new Role("user");
+    Role r3 = new Role("data");
 
-    role1.setRoleid(1);;
-    role2.setRoleid(2);
-    role3.setRoleid(3);
+    r1.setRoleid(1);;
+    r2.setRoleid(2);
+    r3.setRoleid(3);
 
     User u1 = new User("admin","password",
             "admin@lambdaschool.com");
     u1.setUserid(10);
     u1.getRoles()
             .add(new UserRoles(u1,
-                    role1));
+                    r1));
     u1.getRoles()
             .add(new UserRoles(u1,
-                    role2));
+                    r2));
     u1.getRoles()
             .add(new UserRoles(u1,
-                    role3));
+                    r3));
     u1.getUseremails()
             .add(new Useremail(u1,
                     "admin@email.local"));
-    u1.getUseremails()
-            .add(new Useremail(u1,
-                    "admin@mymail.local"));
+
 
     userList.add(u1);
 
@@ -89,10 +91,10 @@ public class UserServiceImplTestNoDB {
     u2.setUserid(20);
     u2.getRoles()
             .add(new UserRoles(u2,
-                    role2));
+                    r2));
     u2.getRoles()
             .add(new UserRoles(u2,
-                    role3));
+                    r3));
     u2.getUseremails()
             .add(new Useremail(u2,
                     "cinnamon@mymail.local"));
@@ -111,7 +113,7 @@ public class UserServiceImplTestNoDB {
     u3.setUserid(30);
     u3.getRoles()
             .add(new UserRoles(u3,
-                    role2));
+                    r2));
     u3.getUseremails()
             .add(new Useremail(u3,
                     "barnbarn@email.local"));
@@ -123,7 +125,7 @@ public class UserServiceImplTestNoDB {
     u4.setUserid(40);
     u4.getRoles()
             .add(new UserRoles(u4,
-                    role2));
+                    r2));
     userList.add(u4);
 
 
@@ -133,7 +135,7 @@ public class UserServiceImplTestNoDB {
     u5.setUserid(50);
     u5.getRoles()
             .add(new UserRoles(u5,
-                    role2));
+                    r2));
     userList.add(u5);
     MockitoAnnotations.initMocks(this);
 
@@ -210,12 +212,71 @@ public class UserServiceImplTestNoDB {
 
   @Test
   public void update() {
+
+    Role r2 = new Role ("user");
+    r2.setRoleid(2);
+    User u2 = new User("cinnamon","password","cinnamon@school.lambda");
+    u2.getRoles().add(new UserRoles(u2,r2));
+    u2.getUseremails().add(new Useremail(u2,"cinnamon@mymail.thump"));
+    u2.getUseremails().add(new Useremail(u2,"hops@mymail.thump"));
+    u2.getUseremails().add(new Useremail(u2,"bunny@email.thump"));
+
+
+
+    Mockito.when(rolerepos.findById(2L))
+            .thenReturn(Optional.of(r2));
+    Mockito.when(userRepository.findById(103L))
+            .thenReturn(Optional.of(userList.get(2)));
+
+    Mockito.when(userRepository.save(any(User.class)))
+            .thenReturn(u2);
+    Mockito.when(helperFunctions.isAuthorizedToMakeChange(anyString()))
+            .thenReturn(true);
+        assertEquals("bunny@email.thump",
+                userService.update(u2,103L)
+                        .getUseremails()
+                        .get(2)
+                        .getUseremail());
   }
 
+
   @Test
-  public void deleteAll() {
+  public void deleteAll(){
+  Mockito.doNothing()
+          .when(userRepository)
+          .deleteAll();
+  userService.deleteAll();
+  assertEquals(5,userList.size());
+
+
+
+
+
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//  @Test
+//  public void deleteAll() {
+//    Mockito.when(userRepository.deleteAll())
+//            .thenReturn();
+//  }
+//}
 
 
 
