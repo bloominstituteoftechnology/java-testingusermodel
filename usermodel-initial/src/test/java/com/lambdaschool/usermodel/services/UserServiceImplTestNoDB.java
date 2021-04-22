@@ -32,9 +32,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = UserModelApplicationTesting.class,
-        properties = {
-                "command.line.runner.enabled=false"})
+//@SpringBootTest(classes = UserModelApplicationTesting.class,
+//        properties = {
+//                "command.line.runner.enabled=false"})
 public class UserServiceImplTestNoDB {
   @Autowired
   private RoleService roleService;
