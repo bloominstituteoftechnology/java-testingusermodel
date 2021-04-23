@@ -1,7 +1,5 @@
 package com.lambdaschool.usermodel.services;
 
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lambdaschool.usermodel.UserModelApplicationTesting;
 import com.lambdaschool.usermodel.exceptions.ResourceNotFoundException;
 import com.lambdaschool.usermodel.models.*;
