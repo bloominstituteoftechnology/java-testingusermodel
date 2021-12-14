@@ -3,10 +3,7 @@ package com.lambdaschool.usermodel;
 import com.github.javafaker.Faker;
 import com.github.javafaker.service.FakeValuesService;
 import com.github.javafaker.service.RandomService;
-import com.lambdaschool.usermodel.models.Role;
-import com.lambdaschool.usermodel.models.User;
-import com.lambdaschool.usermodel.models.UserRoles;
-import com.lambdaschool.usermodel.models.Useremail;
+import com.lambdaschool.usermodel.models.*;
 import com.lambdaschool.usermodel.services.RoleService;
 import com.lambdaschool.usermodel.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,16 +58,16 @@ public class SeedData
     {
         userService.deleteAll();
         roleService.deleteAll();
-        Role r1 = new Role("admin");
-        Role r2 = new Role("user");
-        Role r3 = new Role("data");
+        Role r1 = new Role("testadmin");
+        Role r2 = new Role("testuser");
+        Role r3 = new Role("testdata");
 
         r1 = roleService.save(r1);
         r2 = roleService.save(r2);
         r3 = roleService.save(r3);
 
         // admin, data, user
-        User u1 = new User("admin",
+        User u1 = new User("testadmin",
             "password",
             "admin@lambdaschool.local");
         u1.getRoles()
@@ -92,7 +89,7 @@ public class SeedData
         userService.save(u1);
 
         // data, user
-        User u2 = new User("cinnamon",
+        User u2 = new User("testcinnamon",
             "1234567",
             "cinnamon@lambdaschool.local");
         u2.getRoles()
@@ -113,7 +110,7 @@ public class SeedData
         userService.save(u2);
 
         // user
-        User u3 = new User("barnbarn",
+        User u3 = new User("testbarnbarn",
             "ILuvM4th!",
             "barnbarn@lambdaschool.local");
         u3.getRoles()
@@ -124,7 +121,7 @@ public class SeedData
                 "barnbarn@email.local"));
         userService.save(u3);
 
-        User u4 = new User("puttat",
+        User u4 = new User("testputtat",
             "password",
             "puttat@school.lambda");
         u4.getRoles()
@@ -132,7 +129,7 @@ public class SeedData
                 r2));
         userService.save(u4);
 
-        User u5 = new User("misskitty",
+        User u5 = new User("testmisskitty",
             "password",
             "misskitty@school.lambda");
         u5.getRoles()
